@@ -1,9 +1,10 @@
-import sys
-import math
+from imutils.object_detection import non_max_suppression
+from imutils import paths
+import argparse
+import imutils
 import numpy as np
 import cv2 as cv
-import matplotlib.pyplot as plt
-import os
+
 
 def multi_frame_differecing(Frames_five):
 
@@ -41,7 +42,7 @@ def multi_frame_differecing(Frames_five):
 
 
 def main():
-	cap = cv.VideoCapture("./Videos/test2.webm")
+	cap = cv.VideoCapture("./Videos/MVI_0118.MOV")
 	Frames_five = []
 	fgbg = cv.bgsegm.createBackgroundSubtractorMOG()
 
@@ -68,8 +69,9 @@ def main():
 			fgmask = fgbg.apply(Frames_five[frame_number-3])
 
 			MR += fgmask
-			
 
+			MR = imutils.resize(MR, width=min(400, MR.shape[1]))
+		
 			'''
 			# Test images MR
 			path =  "./MR_images/"+ "MR_" + str(len(Frames_five)/5) + ".png"
@@ -81,9 +83,38 @@ def main():
 				break
 			'''
 
+		fgmask = fgbg.apply(gray)
+
+		kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(5,5))
+
+		fgmask = cv.morphologyEx(fgmask, cv.MORPH_OPEN, kernel)
+
+		frame = imutils.resize(frame, width=min(400, frame.shape[1]))
+
+		fgmask = imutils.resize(fgmask, width=min(400, fgmask.shape[1]))
+
+		hog = cv.HOGDescriptor()
+
+		hog.setSVMDetector(cv.HOGDescriptor_getDefaultPeopleDetector())
+
+		(rects, weights) = hog.detectMultiScale(fgmask, winStride=(4, 4), \
+		 padding=(8, 8), scale=1.05)
+
+
+		'''
+		for (x, y, w, h) in rects:
+			cv.rectangle(orig, (x, y), (x + w, y + h), (0, 0, 255), 2)
+
+		'''
+
+		rects = np.array([[x, y, x + w, y + h] for (x, y, w, h) in rects])
+		pick = non_max_suppression(rects, probs=None, overlapThresh=0.65)
+
+		for (xA, yA, xB, yB) in pick:
+			cv.rectangle(frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
 
 		# Display the resulting frame
-		#cv.imshow('frame',gray)
+		cv.imshow('frame',frame)
 		if cv.waitKey(1) & 0xFF == ord('q'):
 			break
 
