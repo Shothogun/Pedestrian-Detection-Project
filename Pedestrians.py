@@ -69,6 +69,8 @@ def main():
 
 			MR += fgmask
 			
+
+			'''
 			# Test images MR
 			path =  "./MR_images/"+ "MR_" + str(len(Frames_five)/5) + ".png"
 
@@ -77,7 +79,9 @@ def main():
 
 			if (len(Frames_five) == 800):
 				break
-	
+			'''
+
+
 		# Display the resulting frame
 		#cv.imshow('frame',gray)
 		if cv.waitKey(1) & 0xFF == ord('q'):
