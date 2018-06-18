@@ -40,7 +40,7 @@ def multi_frame_differecing(Frames_five):
 
 
 def main():
-	cap = cv.VideoCapture("./Videos/terrace1-c0.avi")
+	cap = cv.VideoCapture("./Videos/MVI_0118.MOV")
 	Frames_five = []
 	fgbg = cv.bgsegm.createBackgroundSubtractorMOG()
 
@@ -67,20 +67,22 @@ def main():
 
 			fgmask = fgbg.apply(frame)
 
-			fgmask = imutils.resize(fgmask, width=min(400, fgmask.shape[1]))
+			fgmask = imutils.resize(fgmask, width=min(550, fgmask.shape[1]))
 
 			'''
-
+			
 			# Opening operation in noising videos
 
 			kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(3,3))
 
-			fgmask = cv.morphologyEx(fgmask, cv.MORPH_OPEN, kernel)
+			fgmask = cv.erode(fgmask, kernel)
+
+
 			'''
+		
+			frame = imutils.resize(frame, width=min(550, frame.shape[1]))
 
-			frame = imutils.resize(frame, width=min(400, frame.shape[1]))
-
-			fgmask = imutils.resize(fgmask, width=min(400, fgmask.shape[1]))
+			fgmask = imutils.resize(fgmask, width=min(550, fgmask.shape[1]))
 
 			# Histogram of oriented gradients
 			hog = cv.HOGDescriptor()
@@ -100,7 +102,7 @@ def main():
 			for (xA, yA, xB, yB) in pick:
 				cv.rectangle(frame, (xA, yA), (xB, yB), (255, 0, 100), 2)
 
-			cv.imshow('frame',frame)	
+			cv.imshow('frame',fgmask)	
 
 		# Display the resulting frame
 		if cv.waitKey(1) & 0xFF == ord('q'):
