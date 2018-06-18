@@ -1,76 +1,91 @@
-import cv2
-import numpy as np
+from imutils.object_detection import non_max_suppression
+from imutils import paths
 import extract_mov_obj as emo
+import argparse
+import imutils
+import numpy as np
+import cv2 as cv
 
-def make_360p():
-	cap.set(3, 640)
-	cap.set(4, 360)
+def main():
+	cap = cv.VideoCapture("./Videos/MVI_0125.MOV")
+	Frames_five = []
+	fgbg = cv.bgsegm.createBackgroundSubtractorMOG()
 
-def rescale_frame(frame, percent=75):
-	scale_percent = percent
-	width = int(frame.shape[1] * scale_percent / 100)
-	height = int(frame.shape[0] * scale_percent / 100)
-	dim = (width, height)
-	return cv2.resize(frame, dim, interpolation = cv2.INTER_AREA)
+	while(cap.isOpened()):
+		# Capture frame-by-frame
+		ret, frame = cap.read()
 
-cap = cv2.VideoCapture("Videos/corte.wmv")
-
-make_360p() # Diminui a resolucao (teoricamente)
-
-if (cap.isOpened() == False):
-	print("Error\n")
-
-frame_width = int(cap.get(3))
-frame_height = int(cap.get(4))
-
-out = cv2.VideoWriter('test.avi',cv2.VideoWriter_fourcc(*'XVID'), 25, (frame_width,frame_height))
-
-ret, prev_frame = cap.read()
-
-prev_frame = rescale_frame(prev_frame) # Diminui o tamanho do frame
-
-out.write(prev_frame)
-
-near_frames = [prev_frame]
-
-while(cap.isOpened()):
-
-	ret, cur_frame = cap.read()
-
-	cur_frame = rescale_frame(cur_frame)
-
-	if (ret==True):
-
-		near_frames.append(cur_frame)
-
-		if (len(near_frames) < 3 ): # Printa ate o terceiro frame
-
-			cv2.imshow("Frame", cur_frame)
-			out.write(cur_frame)
-
-		elif (len(near_frames) >= 5 ): # Processa as imagens em relacao ao frame central e prepara para receber o proximo frame
-
-			center_frame = len(near_frames) // 2
-
-			new_frame = emo.MultiFrameDif(near_frames)
-
-			near_frames.remove(near_frames[0])
-
-			new_frame = near_frames[center_frame] * new_frame
-
-			out.write(new_frame)
-			cv2.imshow("Frame", new_frame)
-
-		#frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-
-		if cv2.waitKey(25) & 0xFF == ord('q'):
+		if(ret == False):
 			break
-	else:
-		break	
+			
+		# Convert color from RGB to Gray
+		gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+		height,width = gray.shape
 
-	prev_frame = cur_frame
+	
+		# Get each frame
+		Frames_five.append(gray)
 
-cap.release()
-out.release()
+		# For each 5 frames do the operation
+		if(len(Frames_five)%5 == 0):
 
-cv2.destroyAllWindows()
+			frame_number = len(Frames_five)/5 
+			MR = emo.multi_frame_differecing(Frames_five)
+			fgmask = fgbg.apply(Frames_five[frame_number-3])
+
+			MR += fgmask
+
+			MR = imutils.resize(MR, width=min(400, MR.shape[1]))
+		
+			'''
+			# Test images MR
+			path =  "./MR_images/"+ "MR_" + str(len(Frames_five)/5) + ".png"
+
+
+			cv.imwrite(path, MR)
+
+			if (len(Frames_five) == 800):
+				break
+			'''
+
+		fgmask = fgbg.apply(gray)
+
+		kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(5,5))
+
+		fgmask = cv.morphologyEx(fgmask, cv.MORPH_OPEN, kernel)
+
+		frame = imutils.resize(frame, width=min(400, frame.shape[1]))
+
+		fgmask = imutils.resize(fgmask, width=min(400, fgmask.shape[1]))
+
+		hog = cv.HOGDescriptor()
+
+		hog.setSVMDetector(cv.HOGDescriptor_getDefaultPeopleDetector())
+
+		(rects, weights) = hog.detectMultiScale(fgmask, winStride=(4, 4), \
+		 padding=(8, 8), scale=1.05)
+
+
+		'''
+		for (x, y, w, h) in rects:
+			cv.rectangle(orig, (x, y), (x + w, y + h), (0, 0, 255), 2)
+
+		'''
+
+		rects = np.array([[x, y, x + w, y + h] for (x, y, w, h) in rects])
+		pick = non_max_suppression(rects, probs=None, overlapThresh=0.65)
+
+		for (xA, yA, xB, yB) in pick:
+			cv.rectangle(frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
+
+		# Display the resulting frame
+		cv.imshow('frame',frame)
+		if cv.waitKey(1) & 0xFF == ord('q'):
+			break
+
+	# When everything done, release the capture
+	cap.release()
+	cv.destroyAllWindows()
+
+if __name__ == "__main__":
+	main()
