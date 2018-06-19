@@ -9,11 +9,16 @@ import cv2 as cv
 
 def skin_detection (rects, frame):
 
-	constant = 3.3
-	min_H = (constant - 0.15)/10 - 0.012
-	max_H = (constant - 0.15)/10 + 0.012
-	min_S = (constant + 0.1)/10 - 0.7
-	max_S = (constant + 0.1)/10 + 0.7
+	#constant = 3.3
+
+	min_H = 0
+	max_H = 50
+	min_S = 0.23
+	max_S = 0.68
+	min_R = 95
+	min_G = 40
+	min_B = 20
+
 	position = 0
 	pedestrians = []
 
@@ -29,12 +34,36 @@ def skin_detection (rects, frame):
 
 		rect_height = rects[position][3] - rects[position][1]
 
-		number_pixels = rect_height * rect_width
+		#number_pixels = rect_height * rect_width
 
 		rect_prop = rect_width/rect_height
 
 		new = cv.cvtColor(person, cv.COLOR_BGR2HSV)
 
+		for height in range(rects[position][1], rects[position][3]):
+
+			found = 0
+
+			for width in range (rects[position][0], rects[position][2]):
+
+				color_HSV = person[height, width]
+
+				if (color_HSV[0] > min_H and color_HSV[0] < max_H and color_HSV[1] > min_S and color_HSV[1] < max_S):
+
+					color_BGR = new[height, width]
+
+					if( color_BGR[2] > min_R and color_BGR[0] > min_B and color_BGR[1] > min_G and max(color_BGR) == color_BGR[2] 
+						and (color_BGR[2] - color_BGR[1] > 15 or color_BGR[1] - color_BGR[2] > 15)):
+
+						if (rect_prop < 0.357 and rect_prop > 0.231):
+
+							pedestrians.append(rects[position])
+							found = 1
+							break
+
+			if (found != 0):
+				break
+		'''
 		sum_image = cv.sumElems(new)
 
 		sum_H = sum_image[0]
@@ -49,10 +78,5 @@ def skin_detection (rects, frame):
 		print (med_S)
 		print (rect_prop)
 		#if (med_H > min_H and med_H < max_H and med_S > min_S and med_S < max_S): #Skin color characteristics
-
-		if (rect_prop < 0.357 and rect_prop > 0.231):
-			pedestrians.append(rects[position])
-
+'''
 	return pedestrians
-
-
