@@ -11,7 +11,7 @@ def multi_frame_differecing(Frames_five):
 	height,width = Frames_five[0].shape
 
 	# Which frame is computed
-	frame_number = len(Frames_five)/5 
+	frame_number = int(len(Frames_five)/5) 
 
 	# Values especified by the paper
 	LAO1 = np.zeros((height,width), np.uint8)

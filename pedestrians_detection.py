@@ -1,13 +1,14 @@
 from imutils.object_detection import non_max_suppression
 from imutils import paths
 import extract_mov_obj as emo
+import skin_feature_ext as sfe
 import argparse
 import imutils
 import numpy as np
 import cv2 as cv
 
 def main():
-	cap = cv.VideoCapture("./Videos/MVI_0125.MOV")
+	cap = cv.VideoCapture("./Videos/MVI_0126.MOV")
 	Frames_five = []
 	fgbg = cv.bgsegm.createBackgroundSubtractorMOG()
 
@@ -29,7 +30,7 @@ def main():
 		# For each 5 frames do the operation
 		if(len(Frames_five)%5 == 0):
 
-			frame_number = len(Frames_five)/5 
+			frame_number = int(len(Frames_five)/5)
 			MR = emo.multi_frame_differecing(Frames_five)
 			fgmask = fgbg.apply(Frames_five[frame_number-3])
 
@@ -75,6 +76,12 @@ def main():
 		rects = np.array([[x, y, x + w, y + h] for (x, y, w, h) in rects])
 		pick = non_max_suppression(rects, probs=None, overlapThresh=0.65)
 
+		pick = sfe.skin_detection(pick, frame)
+
+		#print (rects)
+		#print (pick)
+
+	
 		for (xA, yA, xB, yB) in pick:
 			cv.rectangle(frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
 
