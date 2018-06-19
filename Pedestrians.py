@@ -6,41 +6,20 @@ import numpy as np
 import cv2 as cv
 
 
-def multi_frame_differecing(Frames_five):
-
-	Threshold = 70
-	height,width = Frames_five[0].shape
-
-	# Which frame is computed
-	frame_number = len(Frames_five)/5 
-
-	# Values especified by the paper
-	LAO1 = np.zeros((height,width), np.uint8)
-	LAO2 = np.zeros((height,width), np.uint8)
-	D = np.zeros((4,height,width), np.uint8)
-
-	D[0] = Frames_five[frame_number-5] - Frames_five[frame_number-3]
-	D[1] = Frames_five[frame_number-4] - Frames_five[frame_number-3]
-	D[2] = Frames_five[frame_number-2] - Frames_five[frame_number-3]
-	D[3] = Frames_five[frame_number-1] - Frames_five[frame_number-3]
-
-	ret, D[0] = cv.threshold(D[0],Threshold,255,cv.THRESH_BINARY)
-	ret, D[1] = cv.threshold(D[1],Threshold,255,cv.THRESH_BINARY)
-	ret, D[2] = cv.threshold(D[2],Threshold,255,cv.THRESH_BINARY)
-	ret, D[3] = cv.threshold(D[3],Threshold,255,cv.THRESH_BINARY)
-
-	LAO1 = cv.bitwise_and(D[1,:,:],D[2,:,:])
-	LAO2 = cv.bitwise_and(D[0,:,:],D[3,:,:])
-
-	MR = np.zeros((height,width), np.uint8)
-
-	MR = cv.bitwise_or(LAO1,LAO2)
-
-	return MR
+# It's required to install imutils and pyimagesearch
+# for install, type this in the terminal:
+# $ pyp install pyimagesearch
+# $ pyp install imutils
 
 
 def main():
-	cap = cv.VideoCapture("./Videos/MVI_0118.MOV")
+	ap = argparse.ArgumentParser()
+	ap.add_argument("string")
+	args = ap.parse_args()
+
+	path = "./Videos/" + args.string
+
+	cap = cv.VideoCapture(path)
 	Frames_five = []
 	fgbg = cv.bgsegm.createBackgroundSubtractorMOG()
 
@@ -59,27 +38,24 @@ def main():
 		Frames_five.append(gray)
 
 		# For each 5 frames do the operation
-		if(len(Frames_five)%5 == 0):
-
-			frame_number = len(Frames_five)/5 
-
-			MR = multi_frame_differecing(Frames_five)
+		# (Video's frames sincronization)
+		if(len(Frames_five)%3 == 0):
 
 			fgmask = fgbg.apply(frame)
-
-			fgmask = imutils.resize(fgmask, width=min(550, fgmask.shape[1]))
-
-			'''
 			
+			'''
 			# Opening operation in noising videos
 
-			kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(3,3))
+			kernel_A = cv.getStructuringElement(cv.MORPH_ELLIPSE,(3,3))
 
-			fgmask = cv.erode(fgmask, kernel)
+			kernel_B = cv.getStructuringElement(cv.MORPH_ELLIPSE,(5,5))			
+			
+			fgmask = cv.morphologyEx(fgmask, cv.MORPH_OPEN, kernel_A)	
 
+			fgmask = cv.morphologyEx(fgmask, cv.MORPH_CLOSE, kernel_B)	
 
 			'''
-		
+
 			frame = imutils.resize(frame, width=min(550, frame.shape[1]))
 
 			fgmask = imutils.resize(fgmask, width=min(550, fgmask.shape[1]))
@@ -87,9 +63,10 @@ def main():
 			# Histogram of oriented gradients
 			hog = cv.HOGDescriptor()
 
+			# Find human shape
+
 			hog.setSVMDetector(cv.HOGDescriptor_getDefaultPeopleDetector())
 
-			# Find human shape
 
 			(rects, weights) = hog.detectMultiScale(fgmask, winStride=(4, 4), \
 			 padding=(2, 2), scale=1.05)
@@ -100,9 +77,9 @@ def main():
 
 			pick = non_max_suppression(rects, probs=None, overlapThresh=0.4)
 			for (xA, yA, xB, yB) in pick:
-				cv.rectangle(frame, (xA, yA), (xB, yB), (255, 0, 100), 2)
+				cv.rectangle(frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
 
-			cv.imshow('frame',fgmask)	
+			cv.imshow('frame',frame)	
 
 		# Display the resulting frame
 		if cv.waitKey(1) & 0xFF == ord('q'):
