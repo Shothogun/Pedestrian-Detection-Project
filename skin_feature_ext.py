@@ -4,10 +4,11 @@ import argparse
 import imutils
 import numpy as np
 import cv2 as cv
+import math as mt
 
 #def skin_detection(frames_obj, number_pixels, rect_prop):
 
-def skin_detection (rects, frame):
+def skin_detection (rects, frame, MR):
 
 	#constant = 3.3
 
@@ -22,13 +23,21 @@ def skin_detection (rects, frame):
 	position = 0
 	pedestrians = []
 
+	MR_3 = frame.copy()
+
+	MR_3 [:,:,0] = MR
+	MR_3 [:,:,1] = MR
+	MR_3 [:,:,2] = MR
+
+	region = cv.multiply(frame, MR_3)
+
 	for position in range(len(rects)):
 
-		person = frame[rects[position][1]:rects[position][3], rects[position][0]:rects[position][2]]
+		person = region[rects[position][1]:rects[position][3], rects[position][0]:rects[position][2]]
 
-		if (person.shape[1] != 0 and person.shape[0] != 0):
-			cv.imshow('LuL',person)
-			cv.waitKey(1)
+		#if (person.shape[1] != 0 and person.shape[0] != 0):
+			#cv.imshow('LuL',person)
+			#cv.waitKey(1)
 
 		rect_width = rects[position][2] - rects[position][0]
 
@@ -40,28 +49,29 @@ def skin_detection (rects, frame):
 
 		new = cv.cvtColor(person, cv.COLOR_BGR2HSV)
 
-		for height in range(rects[position][1], rects[position][3]):
+		found = 0
 
-			found = 0
+		for height in range(rects[position][1], rects[position][3]):
 
 			for width in range (rects[position][0], rects[position][2]):
 
-				color_HSV = person[height, width]
+				color_HSV = new[height - rects[position][1], width - rects[position][0]]
 
-				if (color_HSV[0] > min_H and color_HSV[0] < max_H and color_HSV[1] > min_S and color_HSV[1] < max_S):
+				if (color_HSV[0]*2 > min_H and color_HSV[0]*2 < max_H and color_HSV[1]/255 > min_S and color_HSV[1]/255 < max_S):
 
-					color_BGR = new[height, width]
+					color_BGR = person[height - rects[position][1], width - rects[position][0]]
 
 					if( color_BGR[2] > min_R and color_BGR[0] > min_B and color_BGR[1] > min_G and max(color_BGR) == color_BGR[2] 
-						and (color_BGR[2] - color_BGR[1] > 15 or color_BGR[1] - color_BGR[2] > 15)):
+						and mt.sqrt(mt.pow(color_BGR[2],2) - mt.pow(color_BGR[1],2)) > 15 ):
 
-						if (rect_prop < 0.357 and rect_prop > 0.231):
+						#if (rect_prop < 0.357 and rect_prop > 0.231):
 
-							pedestrians.append(rects[position])
-							found = 1
+						pedestrians.append(rects[position])
+						found = found + 1
+						if (found == 50):
 							break
 
-			if (found != 0):
+			if (found == 50):
 				break
 		'''
 		sum_image = cv.sumElems(new)
