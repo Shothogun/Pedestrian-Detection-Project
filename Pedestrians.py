@@ -42,19 +42,6 @@ def main():
 		if(len(Frames_five)%3 == 0):
 
 			fgmask = fgbg.apply(frame)
-			
-			'''
-			# Opening operation in noising videos
-
-			kernel_A = cv.getStructuringElement(cv.MORPH_ELLIPSE,(3,3))
-
-			kernel_B = cv.getStructuringElement(cv.MORPH_ELLIPSE,(5,5))			
-			
-			fgmask = cv.morphologyEx(fgmask, cv.MORPH_OPEN, kernel_A)	
-
-			fgmask = cv.morphologyEx(fgmask, cv.MORPH_CLOSE, kernel_B)	
-
-			'''
 
 			frame = imutils.resize(frame, width=min(550, frame.shape[1]))
 
@@ -62,6 +49,8 @@ def main():
 
 			# Histogram of oriented gradients
 			hog = cv.HOGDescriptor()
+
+			
 
 			# Find human shape
 
