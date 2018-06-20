@@ -39,9 +39,6 @@ def multi_frame_differecing(Frames_five):
 	ret, Dif[2] = cv.threshold(Dif[2],Threshold,255,cv.THRESH_BINARY)
 	ret, Dif[3] = cv.threshold(Dif[3],Threshold,255,cv.THRESH_BINARY)
 
-	#cv.imshow('D0', Dif[0])
-	#cv.imshow('D1', Dif[1])
-
 	LAO1 = D[1,:,:]*D[2,:,:]
 	LAO2 = D[0,:,:]*D[3,:,:]
 

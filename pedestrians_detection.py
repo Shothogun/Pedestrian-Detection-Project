@@ -8,9 +8,22 @@ import imutils
 import numpy as np
 import cv2 as cv
 
+# It's required to install imutils and pyimagesearch
+# for install, type this in the terminal:
+# $ pip install pyimagesearch
+# $ pip install imutils
+
+# To stop the program press 'q' in the displaying image 
+
 def main():
-	#cap = cv.VideoCapture("./Videos/site0.avi")
-	cap = cv.VideoCapture("./Videos/MVI_0114.MOV")
+	ap = argparse.ArgumentParser()
+	ap.add_argument("string")
+	args = ap.parse_args()
+
+	path = "./Videos/" + args.string
+
+	cap = cv.VideoCapture(path)
+
 	Frames_five = []
 	Frames_five_gray = []
 	fgbg = cv.bgsegm.createBackgroundSubtractorMOG()
@@ -36,21 +49,20 @@ def main():
 			
 			cur_frame = 2
 
-			MR = emo.multi_frame_differecing(Frames_five_gray)
-			teste_mr = MR.copy()
-			fgmask_1 = fgbg.apply(Frames_five[cur_frame])
+			# Extracting moving objects
 
-			MR *= fgmask_1
+			MR = emo.multi_frame_differecing(Frames_five_gray)
+
+			fgmask = fgbg.apply(Frames_five[cur_frame])
+			MR *= fgmask
+
+			# Make sure the moving region image is binary
 
 			ret, MR = cv.threshold(MR, 0, 255, cv.THRESH_BINARY) 
 
-			#MR = imutils.resize(MR, width=min(400, MR.shape[1]))
-
-			ret, labels = cv.connectedComponents(MR, 8)
-
 			# Improve the classification of moving objects
 
-			kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(5,5))
+			kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(7,7))
 
 			MR = cv.morphologyEx(MR, cv.MORPH_CLOSE, kernel)
 
@@ -58,34 +70,11 @@ def main():
 
 			MR = cv.morphologyEx(MR, cv.MORPH_OPEN, kernel)
 			
-			labeled_image = Frames_five[cur_frame].copy()
-
-			#Map components labels to hue value
-			if (np.max(labels) != 0):
-				label_hue = np.uint8(179*(labels)/np.max(labels))
-
-			else:
-				label_hue = np.uint8(179)
-
-			blank_ch = 255*np.ones_like(label_hue)
-
-			labeled_image [:,:,0] = label_hue
-			labeled_image [:,:,1] = blank_ch
-			labeled_image [:,:,2] = blank_ch
-
-			#cvt for display
-
-			labeled_image = cv.cvtColor(labeled_image, cv.COLOR_HSV2BGR)
-
-			#set bg label to black
-
-			labeled_image[label_hue == 0] = 0
+			# Resize the image and filter for less computational cost
 
 			MR = imutils.resize(MR, width=min(550, MR.shape[1]))
 
 			frame_new = imutils.resize(Frames_five[cur_frame], width=min(550, Frames_five[cur_frame].shape[1]))
-
-			MR = imutils.resize(MR, width=min(550, MR.shape[1]))
 
 			# Histogram of oriented gradients
 			hog = cv.HOGDescriptor()
@@ -104,9 +93,11 @@ def main():
 
 			pick = non_max_suppression(rects, probs=None, overlapThresh=0.4)
 
+			# Improving classification methods
+
 			pick = sfe.skin_detection(pick, frame_new, MR)
 
-			#pick = hhe.head_detection(pick, frame_new, MR)
+			pick = hhe.head_detection(pick, frame_new)
 
 			for (xA, yA, xB, yB) in pick:
 				cv.rectangle(frame_new, (xA, yA), (xB, yB), (0, 255, 0), 2)
@@ -116,10 +107,8 @@ def main():
 			Frames_five_gray.remove(Frames_five_gray[0])
 
 
-			# Display the resulting frame
-			#cv.imshow('frame',fgmask_1)
-			#cv.imshow('teste', teste_mr)
-			#cv.imshow ('labels', labeled_image)
+			# Display the resulting frame and moving region
+
 			cv.imshow('MR', MR)
 			cv.imshow('Frame', frame_new)
 			
