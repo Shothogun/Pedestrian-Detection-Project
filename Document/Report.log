@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.3.13)  20 JUN 2018 03:49
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6600 64-bit) (preloaded format=pdflatex 2018.3.13)  20 JUN 2018 13:26
 entering extended mode
 **./Report.tex
 (Report.tex
@@ -803,15 +803,7 @@ File: background_sub.png Graphic file (type png)
 <use background_sub.png>
 Package pdftex.def Info: background_sub.png  used on input line 67.
 (pdftex.def)             Requested size: 275.52869pt x 156.58461pt.
-LaTeX Font Info:    Try loading font information for U+msa on input line 72.
 
-(D:\MiKTeX\tex\latex\amsfonts\umsa.fd
-File: umsa.fd 2013/01/14 v3.01 AMS symbols A
-)
-LaTeX Font Info:    Try loading font information for U+msb on input line 72.
- (D:\MiKTeX\tex\latex\amsfonts\umsb.fd
-File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-)
 Underfull \hbox (badness 6078) in paragraph at lines 72--73
 []\OT1/ptm/m/n/10 Obtained the mov-ing ob-jects from the scene, the
  []
@@ -825,7 +817,16 @@ File: Non_max.png Graphic file (type png)
 <use Non_max.png>
 Package pdftex.def Info: Non_max.png  used on input line 77.
 (pdftex.def)             Requested size: 276.03056pt x 157.08649pt.
+LaTeX Font Info:    Try loading font information for U+msa on input line 90.
 
+(D:\MiKTeX\tex\latex\amsfonts\umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 90.
+ (D:\MiKTeX\tex\latex\amsfonts\umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+[2 <./background_sub.png> <./Non_max.png>]
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -837,7 +838,9 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[2 <./background_sub.png> <./Non_max.png>] (Report.aux)
+[3
+
+] (Report.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
@@ -849,14 +852,15 @@ Here is how much of TeX's memory you used:
  8174 multiletter control sequences out of 15000+200000
  35842 words of font info for 71 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,8n,35p,752b,253s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 41i,8n,35p,1626b,253s stack positions out of 5000i,500n,10000p,200000b,50000s
 {D:/MiKTeX/fonts/enc/dvips/base/8r.enc}<D:/MiKTeX/fonts/type1/public/amsfonts
-/cm/cmsy10.pfb><D:/MiKTeX/fonts/type1/urw/times/utmb8a.pfb><D:/MiKTeX/fonts/typ
-e1/urw/times/utmbi8a.pfb><D:/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><D:/MiKTeX
-/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Report.pdf (2 pages, 473696 bytes).
+/cm/cmmi10.pfb><D:/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><D:/MiKTeX/f
+onts/type1/public/amsfonts/cm/cmsy10.pfb><D:/MiKTeX/fonts/type1/urw/times/utmb8
+a.pfb><D:/MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><D:/MiKTeX/fonts/type1/urw/t
+imes/utmr8a.pfb><D:/MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Report.pdf (3 pages, 499812 bytes).
 PDF statistics:
- 32 PDF objects out of 1000 (max. 8388607)
+ 43 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  11 words of extra memory for PDF output out of 10000 (max. 10000000)
 

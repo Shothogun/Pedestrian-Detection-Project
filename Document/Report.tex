@@ -59,7 +59,7 @@ the online expectation maximisation algorithm. His algorithm also permits the sh
 
 \section{Proposed solutions}
 
-	In the first approach of this problem, the process of Multi-frame-differecing with the adaptive background model as adopted to track moving regions and objects, as proposed by Xin Zhang \textit{et al} [1]. However, this process was simplified to result in a more understandable and less computational costing process that was combined with morphology operations to remove possible noises and form in a more connected way the moving regions. The Multi-frame-differecing was implemented in the algorithm as proposed, resulting frames less noised and with less false-positive regions.
+	In the first approach of this problem, the process of multi-frame-differencing with the adaptive background model as adopted to track moving regions and objects, as proposed by Xin Zhang \textit{et al} [1]. However, this process was simplified to result in a more understandable and less computational costing process that was combined with morphology operations to remove possible noises and form in a more connected way the moving regions. The multi-frame-differencing was implemented in the algorithm as proposed, resulting frames less noised and with less false-positive regions.
 	
 	At the process of adaptative background model, a built-in function from "OpenCV" was used to reproduce the process of subtraction of the scene from most of the stationary objects from the scene, and with the foreground mask generated (phenomenon described in the Figure 1), it is multiplied with the moving region obtained from the Multi-frame-differecing , producing a frame that contains only the objects belong to the foreground of the image and only regions where were registered movement, that is in fact significantly moving.
 
@@ -69,7 +69,7 @@ the online expectation maximisation algorithm. His algorithm also permits the sh
 	\label{fig}
 	\end{figure}
 	
-	Obtained the moving objects from the scene, the HOG(histogram of oriented gradients) is performed in each frame from the video by an built$-$in function and, along with a pre-trained SVM(support vector machine) to classify human, the moving objects whose shape matches with the human shape are candidates of tracking in the process of detect pedestrian. This process is possible with the comparisson of the descriptors that the HOG provides from a window of the image(process repeated along the entire frame and for each scene) with the information that the SVM learned to classify shapes.	
+	Obtained the moving objects from the scene, the HOG(histogram of oriented gradients) is performed in each frame from the video by an built-in function and, along with a pre-trained SVM(support vector machine) to classify human, the moving objects whose shape matches with the human shape are candidates of tracking in the process of detect pedestrian. This process is possible with the comparison of the descriptors that the HOG provides from a window of the image(process repeated along the entire frame and for each scene) with the information that the SVM learned to classify shapes.	
 	
 	Once its model provide a set of the frame's regions that SVM classify as human, its possible that in the same region of a pedestrian more than one subregion is detected as human shape, and as consequence, more than one rectangle detection is marked around the person( a event observed in Figure 2).
 	
@@ -79,22 +79,27 @@ the online expectation maximisation algorithm. His algorithm also permits the sh
 	\label{fig}
 	\end{figure}
 	
-	For correct this kind of error, a nonmax supression built-in function was used for to reduce this redundancy tracking error. This algorithm basically get every bounding boxes that surrounds human shape compare its ratio of overlapping between then, and being a thresh ratio set, every boxes that share a ratio bigger than the overlap thresh is supressed from the region. Therefore, only sufficient distant bounding boxes will appear in the pedestrian detection.
+	For correct this kind of error, a nonmax suppression built-in function was used for to reduce this redundancy tracking error. This algorithm basically get every bounding boxes that surrounds human shape compare its ratio of overlapping between then, and being a thresh ratio set, every boxes that share a ratio bigger than the overlap thresh is supressed from the region. Therefore, only sufficient distant bounding boxes will appear in the pedestrian detection.
 	
 	The previous technique was implemented in the place of the analysis of the proportion of the moving objects in relation to the average human one that is given by the literature. One of the reasons of this replacement is that the idea tested to the extraction of the moving elements that had as base the manipulation of these elements through morphological operations to create bigger and filled connected elements, so that a algorithm of labelling connected objects could offer the solution needed. However, the complexity of the scene wouldn't enable this strategy, since a lot of components of the same pedestrian will remain unconnected.
 	
-	After the identification of a possible human in the image, it is proposed by Xin Zhang
-to make a classification of the figure based on the color of the skin of a human being and another classification based on the number of circles found in the region to determine the existence of a human head. In the case of the algorithm proposed, because of the lack of information about why the formula is created and the way that it must be implemented. So it was chosen to only verify the existence of a certain number o pixels in the moving object that satisfies the conditions given by S. Kolkur \textit{et al} [5] so it can be classified as human skin, and in consequence, a human as a whole.
+	After the identification of a possible human in the image, it is proposed by Xin Zhang \textit{et al} [1] to make a classification of the figure based on the color of the skin of a human being and another classification based on the number of circles found in the region to determine the existence of a human head. About the algorithm proposed for the skin classifier, because of the lack of information about why the formula is created and the way that it must be implemented, together with the difficulty of determine the constant required, was decided to only verify the existence of a certain number o pixels in the moving object that satisfies the conditions given by S. Kolkur \textit{et al} [5] so it can be classified as human skin using the HSV and BGR color spaces, and in consequence, a human as a whole.
 	
-	Although the identification of a human by its skin color being simple and not precise, since a lot of things can have a color that is similar to a human skin and that it's very likely that some pixels in the region will pass the requirements of the classification it still useful in case there is a monochromatic element or a low image resolution. Follow the conditions used:
+	Although the identification of a human by its skin color being simplistic and not very precise since a lot of things can have a color that is similar to a human skin and that it's very likely that some pixels in the region will pass the requirements of the classification, the algorithm still useful in case there is a monochromatic element or a low image resolution. Follow the conditions used:
 	
+\[ 0 <= H <= 50\]
+\[ 0.23 <= S <= 0.68\]
+\[ R > 95 , B > 20, G > 40\]
+\[ max(RGB) = R\]
+\[ |R - G| > 15\]
 	
+	In relation to the head identifier algorithm,it was used the model proposed with some alterations to better fit the classification through a histogram of oriented gradients(HOG). The head size was computed using the given formula and the circles were computed using the Hough Transform providing pre-defined possible head radius and using that to set a range to the radius of the circles since it gave a better result than not informing that information. However, because the rectangle size is controlled by the HOG analyser and do not follow the pattern of rectangle proportion exemplified, the lower boundary of the number of circles found was lowered by one to get better results without detecting a lot more of false-positive regions but resulting, in some situation, in more false-negative regions, since these regions aren't always completely connected as a consequence of the method used.
 	
-	In relation to the head identifier algorithm 
-	
-	
+	\[Head proportion = 0.0065 +- 0.005\]
 
 \section{Experimental results}
+
+	We evaluate the above approach on real-life data. The camera is fixed with minimal movement at different distances from the pedestrian, close and far shots, losing some of the perspective of the person shape when she is big or to small for the camera. In addition to that were considered different ambiance conditions together with different angles of capture. To realize the testing of the program were utilized around 100 frames from each condition video. Several example images from the training and test sets used are shown in Fig. 3. Image (a) is taken at 11:30 am in a sunny day while the image (b) is taken under the shadows. The multi-frame-differencing can efficiently detect the movement of objects with some consistency in images such pedestrians and cars, presenting a confusion with plants, when not in a background with the same color then them. Using the method of HOG and SVM the algorithm is capable of ignore small movements in the image and with the human head detection is capable of ignore a lot of other moving objects of the scene, like you can see in image (c) and (d). Because also of the use of HOG, SVM and multi-frame-differencing the algorithm detect well people walking perpendicularly to the camera and close to it, but has problems identifying changes when the person is parallel to the camera or people far from it. The program is also capable of identifying a human even without all the body being in the frame and in different distances as is shown in the image (e) and (a). Using those test frames of 7 different videos, we computed the following analysis of the algorithm:
 
 \section{Conclusion}
 
