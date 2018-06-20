@@ -33,9 +33,6 @@ def head_detection (rects, frame):
 
 		number_circles = image_circles.shape[1]
 
-		print (number_circles)
-		print (head_min_radius)
-
 		if (number_circles <= 4 * head_max_radius and number_circles >= 2 * head_min_radius - 1):
 			pedestrian.append(rects[position])
 
