@@ -67,15 +67,16 @@ def main():
 
 			hog.setSVMDetector(cv.HOGDescriptor_getDefaultPeopleDetector())
 
-
 			(rects, weights) = hog.detectMultiScale(fgmask, winStride=(4, 4), \
 			 padding=(2, 2), scale=1.05)
 
 			rects = np.array([[x, y, x + w, y + h] for (x, y, w, h) in rects])
-
+			
 			# Non-max-supression process
 
 			pick = non_max_suppression(rects, probs=None, overlapThresh=0.4)
+
+			
 			for (xA, yA, xB, yB) in pick:
 				cv.rectangle(frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
 

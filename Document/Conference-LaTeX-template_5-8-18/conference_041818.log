@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.6.17)  17 JUN 2018 21:48
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.6.17)  20 JUN 2018 00:05
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -313,8 +313,7 @@ Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1357.
 Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1358.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1359.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1360.
-)
-No file conference_041818.aux.
+) (./conference_041818.aux)
 \openout1 = `conference_041818.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 12.
@@ -400,22 +399,7 @@ LaTeX Font Info:    Calculating math sizes for size <11> on input line 57.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 60.
 
-LaTeX Warning: Reference `AA' on page 1 undefined on input line 88.
-
-
 LaTeX Warning: Reference `SCM' on page 1 undefined on input line 88.
-
-
-LaTeX Warning: Reference `eq' on page 1 undefined on input line 122.
-
-
-LaTeX Warning: Reference `eq' on page 1 undefined on input line 122.
-
-
-LaTeX Warning: Reference `eq' on page 1 undefined on input line 122.
-
-
-LaTeX Warning: Reference `eq' on page 1 undefined on input line 123.
 
 [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
 
@@ -445,9 +429,9 @@ Type  H <return>  for immediate help.
 l.232 \centerline{\includegraphics{fig1.png}}
                                               
 Here is how much of TeX's memory you used:
- 4450 strings out of 493029
- 64724 string characters out of 6136234
- 134745 words of memory out of 5000000
+ 4452 strings out of 493029
+ 64768 string characters out of 6136234
+ 134770 words of memory out of 5000000
  7914 multiletter control sequences out of 15000+600000
  50029 words of font info for 110 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
