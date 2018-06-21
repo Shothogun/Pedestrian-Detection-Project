@@ -1,0 +1,13 @@
+Adaptive Background Mixture Model
+
+- Forma adaptada e aprimorada do modelo de grimson (multi-colour background model per pixel -> the method suffers
+from slow learning at the beginning, especially in busy environments. In addition, it can not distinguish
+between moving shadows and moving objects.
+
+-Background subtraction involves calculating a reference image, subtracting each new frame from
+this image and thresholding the result.What results is a binary segmentation of the image which highlights
+regions of non-stationary objects
+
+Histogram of Oriented Gradients
+
+- Gradient measure: sobel filter
