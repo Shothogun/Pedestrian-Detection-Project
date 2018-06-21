@@ -1,71 +1,51 @@
-import cv2
+from imutils.object_detection import non_max_suppression
+from imutils import paths
+import argparse
+import imutils
 import numpy as np
-import math
+import cv2 as cv
 
-def MultiFrameDif(near_frames):
+def multi_frame_differecing(Frames_five):
 
-	size = len(near_frames)
+	Threshold = 180
+	height,width = Frames_five[0].shape
 
-	central_frame = size // 2
+	# Which frame is computed
+	cur_frame = 2 
 
+	# Values especified by the paper
+	LAO1 = np.zeros((height,width), np.uint8)
+	LAO2 = np.zeros((height,width), np.uint8)
+	D = np.zeros((4,height,width), np.float32)
+	Dif = np.zeros((4,height, width), np.float32)
 
-	median = []
-	diferences = []
+	D[0] = Frames_five[cur_frame-2] - Frames_five[cur_frame]
+	D[1] = Frames_five[cur_frame-1] - Frames_five[cur_frame]
+	D[2] = Frames_five[cur_frame+1] - Frames_five[cur_frame]
+	D[3] = Frames_five[cur_frame+2] - Frames_five[cur_frame]
 
-	frame_width = near_frames[central_frame].shape[1]
-	frame_height = near_frames[central_frame].shape[0]
+	Dif[0] = cv.sqrt(cv.pow(D[0], 2))
+	Dif[1] = cv.sqrt(cv.pow(D[1], 2))
+	Dif[2] = cv.sqrt(cv.pow(D[2], 2))
+	Dif[3] = cv.sqrt(cv.pow(D[3], 2))
 
-	if(len(near_frames[central_frame].shape) > 2): # Não é preto e branco
+	Dif[0] = (Dif[0]).astype('uint8')
+	Dif[1] = (Dif[1]).astype('uint8')
+	Dif[2] = (Dif[2]).astype('uint8')
+	Dif[3] = (Dif[3]).astype('uint8')
 
-		near_frames[central_frame] = cv2.cvtColor(near_frames[central_frame], cv2.COLOR_RGB2GRAY)
+	ret, Dif[0] = cv.threshold(Dif[0],Threshold,255,cv.THRESH_BINARY)
+	ret, Dif[1] = cv.threshold(Dif[1],Threshold,255,cv.THRESH_BINARY)
+	ret, Dif[2] = cv.threshold(Dif[2],Threshold,255,cv.THRESH_BINARY)
+	ret, Dif[3] = cv.threshold(Dif[3],Threshold,255,cv.THRESH_BINARY)
 
-	# Declaring variables
-	diference = 7
-	diference_result = near_frames [central_frame]
-	moving_region = near_frames [central_frame]
-	and_op = near_frames [central_frame]
+	LAO1 = D[1,:,:]*D[2,:,:]
+	LAO2 = D[0,:,:]*D[3,:,:]
 
-	for position in range(size):
+	MR = np.zeros((height,width), np.uint8)
 
-		if (position != central_frame):
+	MR = cv.bitwise_or(LAO1,LAO2)
 
-			for height in range (frame_height):
+	MR = MR.astype('uint8')
 
-				if(len(near_frames[position].shape) > 2): # Não é preto e branco
-
-					near_frames[position] = cv2.cvtColor(near_frames[position], cv2.COLOR_RGB2GRAY)
-
-				for width in range (frame_width):
-
-					threshold = 50
-
-					diference = near_frames[position][height, width] - near_frames[central_frame][height, width]
-
-					if (diference < 0):
-						diference = diference * -1
-
-					diference_result[height, width] = diference
-
-					if (diference_result[height, width] < threshold):
-
-						diference_result[height, width] = 0
-
-
-					else:
-
-						diference_result[height, width] = 1
-
-		diferences.append(diference_result)
-
-	# Median of diference to frames with distance 2 and 1
-	cv2.bitwise_and(diferences[0], diferences[len(diferences) - 1], and_op)
-	median.append (and_op)
-
-	cv2.bitwise_and(diferences[1], diferences[len(diferences) - 2], and_op)
-	median.append (and_op)
-
-	cv2.bitwise_or(median[0], median[1], moving_region)
-
-	return moving_region
-
-#def AdaptiveBackground:
+	return MR
